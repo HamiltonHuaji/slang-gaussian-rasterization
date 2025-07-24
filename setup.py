@@ -26,7 +26,6 @@ setup(
     package_data={
         'slang_gaussian_rasterization': ['slang_gaussian_rasterization/internal/slang/alpha_blend_sai.slang']
     },
-    install_requires=['slangtorch',
-                      'torch']
+    install_requires=['slangpy', 'torch']
 )
 

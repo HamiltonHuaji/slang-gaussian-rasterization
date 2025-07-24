@@ -1,5 +1,5 @@
 __pycache__/
-.slangtorch_cache
+.slangpy_cache
 *.lock
 build/
 dist/

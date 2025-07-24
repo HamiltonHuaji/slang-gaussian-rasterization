@@ -32,21 +32,18 @@ def get_slang_projection_matrix(znear, zfar, fy, fx, height, width, device):
 
     return P
 
-def common_camera_properties_from_gsplat(viewmats, Ks, height, width):
+def common_camera_properties_from_gsplat(viewmats, Ks, height, width, zfar = 100.0, znear = 0.01):
   """ Fetches all the Camera properties from the inria defined object"""
-  zfar = 100.0
-  znear = 0.01
-  
-  world_view_transform = viewmats
-  fx = Ks[0,0]
-  fy = Ks[1,1]
-  projection_matrix = get_slang_projection_matrix(znear, zfar, fy, fx, height, width, Ks.device)
-  fovx = focal2fov(fx, width)
-  fovy = focal2fov(fy, height)
+    world_view_transform = viewmats
+    fx = Ks[0,0]
+    fy = Ks[1,1]
+    projection_matrix = get_slang_projection_matrix(znear, zfar, fy, fx, height, width, Ks.device)
+    fovx = focal2fov(fx, width)
+    fovy = focal2fov(fy, height)
 
-  cam_pos = viewmats.inverse()[:, 3]
+    cam_pos = viewmats.inverse()[:, 3]
 
-  return world_view_transform, projection_matrix, cam_pos, fovy, fovx
+    return world_view_transform, projection_matrix, cam_pos, fovy, fovx
  
 
 
