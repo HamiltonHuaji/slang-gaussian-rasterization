@@ -19,12 +19,12 @@ shaders_path = Path(__file__).parent.absolute()
 
 TILE_SIZES_HW = [(4,4), (8,8), (16,16)]
 
-vertex_shader = slangtorch.loadModule("vertex_shader.slang")
-tile_shader = slangtorch.loadModule("tile_shader.slang")
+vertex_shader = slangtorch.loadModule(shaders_path / "vertex_shader.slang")
+tile_shader = slangtorch.loadModule(shaders_path / "tile_shader.slang")
 
 alpha_blend_shaders = {}
 for tile_height, tile_width in TILE_SIZES_HW:
     alpha_blend_shaders[(tile_height, tile_width)] = slangtorch.loadModule(
-        "alphablend_shader.slang",
+        shaders_path / "alphablend_shader.slang",
         defines={"PYTHON_TILE_HEIGHT": tile_height, "PYTHON_TILE_WIDTH": tile_width},
     )
