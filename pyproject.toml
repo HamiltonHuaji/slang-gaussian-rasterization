@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "slang_gaussian_rasterization"
+version = "0.1.0"
+description = "A Slang.D implementation of the CUDA acclerated rasterizer that is described in the \"3D Gaussian Splatting for Real-Time Rendering of Radiance Fields\", Kerbl and Kopanas 2023"
+authors = [
+    {name = "George Kopanas", email = "gkopanas@google.com"},
+]
+license = {text = "Apache 2.0"}
+requires-python = ">=3.7"
+dependencies = [
+    "slangpy",
+    "torch",
+]
+
+[tool.hatch.build]
+include = [
+    "slang_gaussian_rasterization/internal/slang/*.slang",
+]
+exclude = [
+    "*~",
+    "*.py[cod]",
+    "*.so",
+    "*.lock",
+]

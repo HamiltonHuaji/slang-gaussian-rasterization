@@ -33,7 +33,7 @@ def get_slang_projection_matrix(znear, zfar, fy, fx, height, width, device):
     return P
 
 def common_camera_properties_from_gsplat(viewmats, Ks, height, width, zfar = 100.0, znear = 0.01):
-  """ Fetches all the Camera properties from the inria defined object"""
+    """ Fetches all the Camera properties from the inria defined object"""
     world_view_transform = viewmats
     fx = Ks[0,0]
     fy = Ks[1,1]
@@ -62,7 +62,7 @@ def rasterization(
     radius_clip: float = 0.0,
     eps2d: float = 0.3,
     sh_degree: Optional[int] = None,
-    packed: bool = True,
+    packed: bool = False,
     tile_size: int = 16,
     backgrounds: Optional[Tensor] = None,
     render_mode: Literal["RGB", "D", "ED", "RGB+D", "RGB+ED"] = "RGB",
@@ -73,26 +73,29 @@ def rasterization(
     distributed: bool = False,
 ) -> Tuple[Tensor, Tensor, Dict]:
 
-  assert viewmats.shape[0] == 1, "Camera Batching is not support in the slang-gaussian-rasterization"
-  assert Ks.shape[0] == 1, "Camera Batching is not support in the slang-gaussian-rasterization"
-  assert not(len(colors.shape) == 4 and colors.shape[0] == 1), "Camera Batching is not support in the slang-gaussian-rasterization"
-  assert render_mode == "RGB", "Currently only render_mode=\"RGB\" is supported."
-  assert rasterize_mode == "classic", "Currently only rasterize_mode=\"classic\" is supported."
-  assert absgrad == False, "Currently only absgrd=False is supported."
-  assert backgrounds is None
-  assert packed == False, "Currently only packed=False is supported."
-  assert sparse_grad == False, "Currently only sparce_grad=False is supported."
-  assert distributed == False, "Currently ony distributed=False is supported."
+    assert viewmats.shape[0] == 1, "Camera Batching is not support in the slang-gaussian-rasterization"
+    assert Ks.shape[0] == 1, "Camera Batching is not support in the slang-gaussian-rasterization"
+    assert not(len(colors.shape) == 4 and colors.shape[0] == 1), "Camera Batching is not support in the slang-gaussian-rasterization"
+    assert render_mode == "RGB", "Currently only render_mode=\"RGB\" is supported."
+    assert rasterize_mode == "classic", "Currently only rasterize_mode=\"classic\" is supported."
+    assert absgrad == False, "Currently only absgrd=False is supported."
+    assert backgrounds is None
+    assert packed == False, "Currently only packed=False is supported."
+    assert sparse_grad == False, "Currently only sparce_grad=False is supported."
+    assert distributed == False, "Currently ony distributed=False is supported."
 
-  world_view_transform, projection_matrix, cam_pos, fovy, fovx = common_camera_properties_from_gsplat(viewmats[0], Ks[0], height, width)
+    world_view_transform, projection_matrix, cam_pos, fovy, fovx = common_camera_properties_from_gsplat(viewmats[0], Ks[0], height, width)
 
-  render_pkg = render_alpha_blend_tiles_slang_raw(means, quats, scales, opacities, 
-                                                  colors, sh_degree,
-                                                  world_view_transform, projection_matrix, cam_pos,
-                                                  fovy, fovx, height, width, tile_size=tile_size)
+    render_pkg = render_alpha_blend_tiles_slang_raw(
+        means, quats, scales, opacities, 
+        colors, sh_degree,
+        world_view_transform, projection_matrix, cam_pos,
+        fovy, fovx, height, width, tile_size=tile_size
+    )
 
+    meta = {
+        "radii": render_pkg["radii"][None, ...],
+        "means2d": render_pkg["viewspace_points"]
+    }
 
-  meta = {"radii": render_pkg["radii"][None, ...],
-          "means2d": render_pkg["viewspace_points"]}
-
-  return render_pkg["render"].permute(1,2,0)[None,...], None, meta
+    return render_pkg["render"].permute(1,2,0)[None,...], None, meta

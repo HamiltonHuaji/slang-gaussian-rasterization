@@ -18,19 +18,19 @@ from os import PathLike
 from pathlib import Path
 
 shaders_path = Path(__file__).parent.absolute()
-device = slangpy.create_device(include_paths=[shaders_path])
+device = slangpy.create_device(include_paths=[shaders_path], enable_cuda_interop=True, enable_print=True)
 
 TILE_SIZES_HW = [(4,4), (8,8), (16,16)]
 
-vertex_shader = slangpy.Module.load_from_file(device, "vertex_shader.slang")
-tile_shader = slangpy.Module.load_from_file(device, "tile_shader.slang")
+vertex_shader = slangpy.TorchModule.load_from_file(device, "vertex_shader.slang")
+tile_shader = slangpy.TorchModule.load_from_file(device, "tile_shader.slang")
 
 with open(shaders_path / "alphablend_shader.slang", "r") as f:
     alpha_blend_shader_source = f.read()
 
 alpha_blend_shaders = {}
 for tile_height, tile_width in TILE_SIZES_HW:
-    alpha_blend_shaders[(tile_height, tile_width)] = slangpy.Module.load_from_source(
+    alpha_blend_shaders[(tile_height, tile_width)] = slangpy.TorchModule.load_from_source(
         device, "alphablend_shader.slang",
         alpha_blend_shader_source.replace('PYTHON_TILE_HEIGHT', str(tile_height)).replace('PYTHON_TILE_WIDTH', str(tile_width)),
     )
